@@ -39,32 +39,11 @@ app.use(helmet());
 // as a single value — the CORS spec doesn't allow returning a multi-value
 // Access-Control-Allow-Origin header, so we can't just pass the raw env
 // string straight through.
-const allowedOrigins = (process.env.CLIENT_URL || "")
-  .split(",")
-  .map((o) => o.trim())
-  .filter(Boolean);
-
-const isAllowedOrigin = (origin) => {
-  if (!origin) return true;
-
-  if (allowedOrigins.includes(origin)) return true;
-
-  // Vercel preview/deployment domains are dynamic, so allow all *.vercel.app hosts.
-  return /^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)*\.vercel\.app$/.test(origin);
-};
-
 const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow non-browser tools (curl/Postman) that send no Origin header.
-    if (isAllowedOrigin(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS blocked for origin: ${origin}`));
-    }
-  },
+  origin: true,
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 };
 
 app.use(cors(corsOptions));
